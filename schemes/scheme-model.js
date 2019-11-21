@@ -3,7 +3,11 @@ const db = require('../data/dbConfig');
 module.exports = {
   find,
   findById,
-  findSteps
+  findSteps,
+  add,
+  update,
+  remove,
+  addStep
 };
 
 function find() {
@@ -17,20 +21,45 @@ function findById(id) {
 }
 
 function findSteps(id) {
-  return (
-    db('steps')
-      .orderBy('step_number')
-      .join('schemes', 'steps.scheme_id', 'schemes.id')
-      .where({ scheme_id: id })
-      // .select('scheme.scheme_name', 'steps.step_number', "steps.instructions" )
-      .select(
-        'steps.id',
-        'schemes.scheme_name',
-        'steps.step_number',
-        'steps.instructions'
-      )
-  );
+  return db('steps')
+    .orderBy('step_number')
+    .join('schemes', 'steps.scheme_id', 'schemes.id')
+    .where({ scheme_id: id })
+    .select(
+      'steps.id',
+      'schemes.scheme_name',
+      'steps.step_number',
+      'steps.instructions'
+    );
+}
+
+function add(scheme) {
+  return db('schemes')
+    .insert(scheme)
+    .then((ids) => {
+      return findById(ids[0]);
+    });
+}
+
+function addStep(step, scheme_id) {
+  return db('steps')
+    .join('schemes', 'steps.scheme_id', 'schemes.id')
+    .insert({...step, scheme_id})
 
 
-  
+}
+
+function update(changes, id) {
+  return db('schemes')
+    .where({ id: id })
+    .update(changes)
+    .then((changed) => {
+      return findById(id);
+    });
+}
+
+function remove(id) {
+  return db('schemes')
+    .where({ id: id })
+    .del();
 }
