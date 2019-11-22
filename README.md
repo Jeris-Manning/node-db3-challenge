@@ -18,10 +18,45 @@ For this lab you will
 
 Use a graphical tool like `SQLite Studio` to open `./data/northwind.db3` and execute the following queries:
 
-- Display the ProductName and CategoryName for all products in the database. Returns 77 records.
-- Display the order Id and shipper CompanyName for all orders placed before August 9 2012. Returns 429 records.
-- Display the name and quantity of the products ordered in order with Id 10251. Sort by ProductName. Returns 3 records.
-- Display the OrderID, curstomer's Company Name and the employee's Last Name for every order. All columns should be labeled clearly. Returns 16,789 records.
+- `Display the ProductName and CategoryName for all products in the database. Returns 77 records.`
+
+# --------------------------------------------------------
+
+select ProductName, CategoryName from Product
+join Category on Product.CategoryId = Category.Id
+
+# --------------------------------------------------------
+
+- `Display the order Id and shipper CompanyName for all orders placed before August 9 2012. Returns 429 records.`
+
+# --------------------------------------------------------
+
+select Id, ShipName from Orders
+where OrderDate < "2012-08-09" 
+
+# --------------------------------------------------------
+
+- `Display the name and quantity of the products ordered in order with Id 10251. Sort by ProductName. Returns 3 records.`
+
+# --------------------------------------------------------
+
+select ProductName, Quantity from OrderDetail
+join Product on OrderDetail.ProductId = Product.Id
+where OrderDetail.OrderId = 10251
+
+# --------------------------------------------------------
+
+- `Display the OrderID, curstomer's Company Name and the employee's Last Name for every order. All columns should be labeled clearly. Returns 16,789 records.`
+
+# --------------------------------------------------------
+
+select o.id, c.companyname, e.lastname
+from orders o, customer c, employee e
+where o.customerid = c.id
+and o.employeeid = e.id
+
+
+# --------------------------------------------------------
 
 ### Database Methods
 
@@ -82,8 +117,31 @@ The following endpoints are available to test the functionality of the model met
 ## Stretch Problems
 
 - In [SQL Try Editor at W3Schools.com](https://www.w3schools.com/Sql/tryit.asp?filename=trysql_select_top):
-  - Displays CategoryName and a new column called Count that shows how many products are in each category. Shows 9 records.
-  - Display OrderID and a column called ItemCount that shows the total number of products placed on the order. Shows 196 records.
-- Add the following method to your API
+ 
+ ` - Displays CategoryName and a new column called Count that shows how many products are in each category. Shows 9 records.`
+
+# ---------------------------------
+
+select categories.categoryname,
+count(products.productname)
+from categories, products
+where categories.categoryid = products.categoryid
+group by categories.categoryname;
+
+# ---------------------------------`
+  
+  `- Display OrderID and a column called ItemCount that shows the total number of products placed on the order. Shows 196 records.`
+
+# ---------------------------------
+
+select distinct orderid,
+sum(quantity)
+from orderdetails
+group by orderid
+
+# ---------------------------------
+
+- `Add the following method to your API`
+  
   - `addStep(step, scheme_id)`: This method expects a step object and a scheme id. It inserts the new step into the database, correctly linking it to the intended scheme.
   - You may use `POST /api/schemes/:id/addStep` to test this method.
